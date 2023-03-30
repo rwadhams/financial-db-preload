@@ -91,12 +91,15 @@ class ConvertCSV2XMLApp {
 		List<SuncorpDTO> suncorpList = []
 
 		csvFile.eachLine {line ->
-			println line
 			line = line.replaceAll(/&/, '&amp;')
 			Matcher lineMatcher = line =~ linePattern
 			
 			if (lineMatcher.size() == 1) {
+				println "Processing: $line"
 				suncorpList << buildSuncorpDTO(lineMatcher)
+			}
+			else {
+				println "Skipping..: $line"
 			}
 		}
 

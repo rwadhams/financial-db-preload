@@ -34,3 +34,8 @@ startScripts {
 		windowsScriptFile.text = windowsScriptFile.text.replace('CLASSPATH=', 'CLASSPATH=.;')
 	}
 }
+
+applicationDistribution.from("bat") {
+	into "$executableDir"
+	include "*.bat"
+}

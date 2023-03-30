@@ -1,0 +1,3 @@
+call FinancialDBPreLoad.bat
+
+pause
