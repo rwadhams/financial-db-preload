@@ -5,6 +5,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 import com.wadhams.financials.db.preload.dto.SuncorpDTO
+import com.wadhams.financials.db.preload.type.Status
 
 class ConvertCSV2XMLApp {
 		Pattern linePattern = ~/"(.*?)","(.*?)","(.*?)","(.*?)"/
@@ -48,12 +49,25 @@ class ConvertCSV2XMLApp {
 		baseDir.eachFileMatch(~/.*\.csv/) {f ->
 			println "${f.name}"
 			List<SuncorpDTO> suncorpDTOList = buildSuncorpDTOList(f)
+			println ''
+			println "suncorpDTOList size: ${suncorpDTOList.size()}"
+			
+			//filter into two lists
+			List<SuncorpDTO> validDTOList = suncorpDTOList.findAll {dto -> dto.status == Status.Valid}
+			println "validDTOList size: ${validDTOList.size()}"
+			List<SuncorpDTO> bypassDTOList = suncorpDTOList.findAll {dto -> dto.status == Status.Bypass}
+			println "bypassDTOList size: ${bypassDTOList.size()}"
+			println ''
+			println 'Verify that all items below really should have been bypassed:'
+			bypassDTOList.each {dto ->
+				println "\tDate: ${dto.transactionDate}, Amount: ${cf.format(dto.amount)}, Description: ${dto.description}}"
+			}
 			
 			File fout = new File("C:/Mongo/Financial_DB_CSV_Data/${f.name- '.csv' + '.xml'}")
 			PrintWriter pw = fout.newPrintWriter()
 			pw.print '<financials>'
 			
-			suncorpDTOList.each {dto ->
+			validDTOList.each {dto ->
 				pw.print '<data>'
 				
 				//transactionDate
@@ -102,7 +116,8 @@ class ConvertCSV2XMLApp {
 				println "Skipping..: $line"
 			}
 		}
-
+		println ''
+		
 		return suncorpList
 	}
 	
@@ -112,6 +127,9 @@ class ConvertCSV2XMLApp {
 		String regexDate = lineMatcher[0][1]
 		String regexDesc = lineMatcher[0][2]
 		String regexAmt = lineMatcher[0][3]
+		
+		//Status
+		dto.status = Status.Valid	//default
 		
 		//transactionDate
 		dto.transactionDate = regexDate
@@ -158,18 +176,9 @@ class ConvertCSV2XMLApp {
 		else if (suncorpDescription.equals('FOREIGN CURRENCY CONVERSION FEE')) {
 			parsedDescription = 'Currency Conversion Fee'
 		}
-		else if (suncorpDescription.startsWith('INTERNET TRANSFER CREDIT')) {
-			return	//return from closure
-		}
-		else if (suncorpDescription.startsWith('INTERNET TRANSFER DEBIT')) {
-			return	//return from closure
-		}
-		else if (suncorpDescription.startsWith('CREDIT INTEREST')) {
-			return	//return from closure
-		}
 		else {
-			println "ZZZZZZZZZZZ Unparsed description: $suncorpDescription"
 			parsedDescription = suncorpDescription.trim()
+			dto.status = Status.Bypass
 		}
 		//println parsedDescription
 		derivedValuesFromDescription(parsedDescription, dto)
