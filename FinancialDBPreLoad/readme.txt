@@ -3,9 +3,15 @@ README
 
 ConvertCSV2XMLApp
 -----------------
-Copy Suncorp downloaded data files to the input location. Edit the files, removing header and trailer lines.
+Copy a Suncorp downloaded csv data file a resource folder. Rename to financial.csv.
 
 Run App.
 
-Input:	C:\Mongo\Financial_DB_CSV_Data\*.csv
-Output:	C:\Mongo\Financial_DB_CSV_Data\*.xml
+Check the \out and \backup folders.
+
+NOTE: Don't commit the financial.csv to source control(i.e. git).
+
+Project Cleanup
+---------------
+Delete all *.csv files from \backup folder.
+Delete financial.xml from \out folder.
