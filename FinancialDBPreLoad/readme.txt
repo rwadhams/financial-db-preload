@@ -3,7 +3,8 @@ README
 
 ConvertCSV2XMLApp
 -----------------
-Copy a Suncorp downloaded csv data file a resource folder. Rename to financial.csv.
+Copy a Suncorp downloaded csv data file a resource folder. 
+Rename to 'financial.csv'.
 
 Run App.
 
