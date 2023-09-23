@@ -1,6 +1,8 @@
 package com.wadhams.financials.db.preload.app
 
 import java.text.NumberFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -23,6 +25,9 @@ class ConvertCSV2XMLApp {
 		NumberFormat cf		//currency format
 		NumberFormat nf		//number format
 
+		DateTimeFormatter fileRenamePrefixDTF = DateTimeFormatter.ofPattern('yyyyMMdd_HHmmss')
+		String fileRenamePrefix
+		
 	static main(args) {
 		println 'ConvertCSV2XMLApp started...'
 		println ''
@@ -42,63 +47,76 @@ class ConvertCSV2XMLApp {
 		nf.setMinimumFractionDigits(2)
 		nf.setMaximumFractionDigits(2)
 		nf.setGroupingUsed(false)
+		
+		fileRenamePrefix = LocalDateTime.now().format(fileRenamePrefixDTF)
 	}
 	
 	def execute() {
-		File baseDir = new File('C:/Mongo/Financial_DB_CSV_Data')
-		baseDir.eachFileMatch(~/.*\.csv/) {f ->
-			println "${f.name}"
-			List<SuncorpDTO> suncorpDTOList = buildSuncorpDTOList(f)
-			println ''
-			println "suncorpDTOList size: ${suncorpDTOList.size()}"
-			
-			//filter into two lists
-			List<SuncorpDTO> validDTOList = suncorpDTOList.findAll {dto -> dto.status == Status.Valid}
-			println "validDTOList size: ${validDTOList.size()}"
-			List<SuncorpDTO> bypassDTOList = suncorpDTOList.findAll {dto -> dto.status == Status.Bypass}
-			println "bypassDTOList size: ${bypassDTOList.size()}"
-			println ''
-			println 'Verify that all items below really should have been bypassed:'
-			bypassDTOList.each {dto ->
-				println "\tDate: ${dto.transactionDate}, Amount: ${cf.format(dto.amount)}, Description: ${dto.description}}"
-			}
-			
-			File fout = new File("C:/Mongo/Financial_DB_CSV_Data/${f.name- '.csv' + '.xml'}")
-			PrintWriter pw = fout.newPrintWriter()
-			pw.print '<financials>'
-			
-			validDTOList.each {dto ->
-				pw.print '<data>'
-				
-				//transactionDate
-				pw.print "<dt>${dto.transactionDate}</dt>"
-				
-				//amount
-				pw.print "<amt>${dto.amount}</amt>"
-				
-				pw.print "<payee>${dto.payee}</payee>"
-				
-				//description
-				pw.print "<desc>${dto.description}</desc>"
-				
-				pw.print '<asset></asset>'
-				
-				//category
-				pw.print "<cat>${dto.category}</cat>"
-				
-				//large transaction amounts annotate RG3
-				String rg3 = ''
-				if (dto.amount > 100) {
-					rg3 = '$$$'
-				}
-				pw.print "<subcat></subcat><start></start><end></end><rg1></rg1><rg2></rg2><rg3>$rg3</rg3></data>"
-			}
-			pw.println '</financials>'
-			pw.close()
-			
-			println ''
+		File financialFile
+		URL resource = getClass().getClassLoader().getResource("financial.csv")
+		if (resource == null) {
+			throw new IllegalArgumentException("financial.csv not found!")
+		}
+		else {
+			financialFile = new File(resource.toURI())
 		}
 
+		println "${financialFile.name}"
+		List<SuncorpDTO> suncorpDTOList = buildSuncorpDTOList(financialFile)
+		println ''
+		println "suncorpDTOList size: ${suncorpDTOList.size()}"
+		
+		//filter into two lists
+		List<SuncorpDTO> validDTOList = suncorpDTOList.findAll {dto -> dto.status == Status.Valid}
+		println "validDTOList size: ${validDTOList.size()}"
+		List<SuncorpDTO> bypassDTOList = suncorpDTOList.findAll {dto -> dto.status == Status.Bypass}
+		println "bypassDTOList size: ${bypassDTOList.size()}"
+		println ''
+		println 'Verify that all items below really should have been bypassed:'
+		bypassDTOList.each {dto ->
+			println "\tDate: ${dto.transactionDate}, Amount: ${cf.format(dto.amount)}, Description: ${dto.description}}"
+		}
+		
+		File fout = new File("out/financial.xml")
+		PrintWriter pw = fout.newPrintWriter()
+		pw.print '<financials>'
+		
+		validDTOList.each {dto ->
+			pw.print '<data>'
+			
+			//transactionDate
+			pw.print "<dt>${dto.transactionDate}</dt>"
+			
+			//amount
+			pw.print "<amt>${dto.amount}</amt>"
+			
+			pw.print "<payee>${dto.payee}</payee>"
+			
+			//description
+			pw.print "<desc>${dto.description}</desc>"
+			
+			pw.print '<asset></asset>'
+			
+			//category
+			pw.print "<cat>${dto.category}</cat>"
+			
+			//large transaction amounts annotate RG3
+			String rg3 = ''
+			if (dto.amount > 100) {
+				rg3 = '$$$'
+			}
+			pw.print "<subcat></subcat><start></start><end></end><rg1></rg1><rg2></rg2><rg3>$rg3</rg3></data>"
+		}
+		pw.println '</financials>'
+		pw.close()
+
+		//backup original file with datetimestamp
+		File backupFile = new File("backup/${fileRenamePrefix}_financial.csv")
+		backupFile.withPrintWriter {pw2 ->
+			financialFile.eachLine {line ->
+				pw2.println line
+			}
+		}
 	}
 	
 	List<SuncorpDTO> buildSuncorpDTOList(File csvFile) {

@@ -2,6 +2,8 @@
 /.settings/
 /build/
 /bin/
+/backup/*
+!/backup/placeholder.txt
 /out/*
 !/out/placeholder.txt
 .classpath
