@@ -20,6 +20,7 @@ class ConvertCSV2XMLApp {
 		Pattern bpayPattern = ~/BPAY DEBIT VIA INTERNET(.*)REFERENCE NUMBER.*/
 		//Pattern ddPattern  = ~/DIRECT DEBIT(.*)\d{12}/	//DIRECT DEBIT    ORIGIN GAS 052606044487
 		Pattern ddPattern  = ~/DIRECT DEBIT(.*)/
+		Pattern dcPattern  = ~/DIRECT CREDIT(.*)/
 		Pattern foreignPattern  = ~/FOREIGN CURRENCY CONVERSION FEE/
 
 		NumberFormat cf		//currency format
@@ -185,7 +186,14 @@ class ConvertCSV2XMLApp {
 			descMatcher = suncorpDescription =~ ddPattern
 			parsedDescription = descMatcher[0][1].trim()
 		}
+		else if (suncorpDescription.startsWith('DIRECT CREDIT')) {
+			descMatcher = suncorpDescription =~ dcPattern
+			parsedDescription = descMatcher[0][1].trim()
+		}
 		else if (suncorpDescription.startsWith('ATM WITHDRAWAL')) {
+			parsedDescription = suncorpDescription.trim()
+		}
+		else if (suncorpDescription.startsWith('OSKO PAYMENT')) {
 			parsedDescription = suncorpDescription.trim()
 		}
 		else if (suncorpDescription.startsWith('INTERNET EXTERNAL TRANSFER')) {
