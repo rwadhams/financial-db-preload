@@ -10,7 +10,8 @@ Execution
 1	Copy downloaded Suncorp csv file to bin folder.
 		> (e.g. From: C:\Users\rober\Downloads\Csv20230816.csv, To: C:\Temp\FinancialDBPreLoad\bin\).
 
-2	Rename the file 'financial.csv'.
+2a	Delete the existing 'financial.csv' file in the bin folder.
+2b	Rename the copied csv file to 'financial.csv'.
 
 3	Run CallFinancialDBPreLoad.bat
 		> verify script output.
