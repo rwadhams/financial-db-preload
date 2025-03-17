@@ -223,16 +223,6 @@ class ConvertCSV2XMLApp {
 			dto.description = 'Groceries'
 			dto.category = 'FOOD'
 		}
-		else if (parsedDescription.matches(~/KMART.*/)) {
-			dto.payee = 'KMART'
-			dto.description = 'Caravan wares'
-			dto.category = 'CARAVAN_EQUIPMENT'
-		}
-		else if (parsedDescription.matches(~/BUNNINGS.*/)) {
-			dto.payee = 'BUNNINGS'
-			dto.description = 'Caravan wares'
-			dto.category = 'CARAVAN_EQUIPMENT'
-		}
 		else if (parsedDescription.matches(~/DAN MURPHY.*/)) {
 			dto.payee = 'DAN MURPHYS'
 			dto.description = 'Beer &amp; Wine'
@@ -242,11 +232,6 @@ class ConvertCSV2XMLApp {
 			dto.payee = '1ST CHOICE LIQUOR'
 			dto.description = 'Beer &amp; Wine'
 			dto.category = 'ALCOHOL'
-		}
-		else if (parsedDescription.matches(~/COLES EXPRESS.*/)) {
-			dto.payee = 'COLES EXPRESS'
-			dto.description = 'Fill-up'
-			dto.category = 'FUEL'
 		}
 		else if (parsedDescription.matches(~/Belong.*/)) {
 			dto.payee = 'BELONG MOBILE'
