@@ -5,7 +5,8 @@ import groovy.transform.ToString
 
 @ToString(includeNames=true)
 class SuncorpDTO {
-	Status status
+	Status csvStatus
+	//csv data below
 	String transactionDate
 	BigDecimal amount
 	String payee
