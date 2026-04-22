@@ -56,19 +56,26 @@ class WiseCSVService {
 			dto.createdBy = splitLine[18]
 			dto.category = trimQuotes(splitLine[19])	//trimQuotes
 			
-			//business rules
+			//Bypass business rules
 			if (dto.targetCurrency != 'AUD') {
 				dto.csvStatus = Status.Bypass
 			}
-			if (dto.status == 'CANCELLED') {	//??? no test data for this case
+			else if (dto.status == 'CANCELLED') {	//??? no test data for this case
 				dto.csvStatus = Status.Bypass
 			}
-			if (dto.targetAmountAfterFees == '0.00') {
+			else if (dto.targetAmountAfterFees == '0.00') {
 				dto.csvStatus = Status.Bypass
 			}
-			if (dto.idPrefix == 'CARD_ORDER') {
+			else if (dto.idPrefix == 'TRANSFER' && dto.direction == 'IN') {
 				dto.csvStatus = Status.Bypass
 			}
+			else if (dto.idPrefix == 'CARD_ORDER') {
+				dto.csvStatus = Status.Bypass
+			}
+			else if (dto.idPrefix == 'BALANCE_TRANSACTION') {
+				dto.csvStatus = Status.Bypass
+			}
+
 			if (dto.status == 'REFUNDED' && dto.targetAmountAfterFees != '0.00') {
 				dto.targetAmountAfterFees = '-' + dto.targetAmountAfterFees		//negate amount
 			}

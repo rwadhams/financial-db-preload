@@ -16,7 +16,8 @@ class SuncorpCSVService {
 		Pattern visaPurchasePattern = ~/VISA PURCHASE(.*)\d\d\/\d\d.*[A|U][U|S]D/	//ends in AUD or USD
 		//Pattern visaPurchasePattern = ~/VISA PURCHASE(.*)\d\d\/\d\d.*AUD/
 		Pattern visaCreditPattern = ~/VISA CREDIT(.*)\d\d\/\d\d.*AUD/
-		Pattern wdlPattern  = ~/EFTPOS WDL(.*)AU/
+		//Pattern wdlPattern  = ~/EFTPOS WDL(.*)AU/
+		Pattern wdlPattern  = ~/EFTPOS WDL(.*)/
 		Pattern depPattern  = ~/EFTPOS DEP(.*)A?U?/
 		Pattern bpayPattern = ~/BPAY DEBIT VIA INTERNET(.*)REFERENCE NUMBER.*/
 		//Pattern ddPattern  = ~/DIRECT DEBIT(.*)\d{12}/	//DIRECT DEBIT    ORIGIN GAS 052606044487
@@ -155,17 +156,22 @@ class SuncorpCSVService {
 			dto.description = 'Beer &amp; Wine'
 			dto.category = 'ALCOHOL'
 		}
-		else if (parsedDescription.matches(~/Belong.*/)) {
-			dto.payee = 'BELONG MOBILE'
-			dto.description = 'Cell phone'
-			dto.category = 'PHONE_PLAN_ROB'
-		}
-		else if (parsedDescription.matches(~/Telstra.*/)) {
-			dto.payee = 'TELSTRA'
-			dto.description = 'Wifi data sim | Cell phone'
-			dto.category = 'DATA_PLAN | PHONE_PLAN_MOLLY'
-		}
-		else if (parsedDescription.matches(~/APPLE.*/)) {
+//		else if (parsedDescription.matches(~/Belong.*/)) {
+//			dto.payee = 'BELONG MOBILE'
+//			dto.description = 'Cell phone'
+//			dto.category = 'PHONE_PLAN_ROB'
+//		}
+//		else if (parsedDescription.matches(~/Telstra.*/)) {
+//			dto.payee = 'TELSTRA'
+//			dto.description = 'Wifi data sim | Cell phone'
+//			dto.category = 'DATA_PLAN | PHONE_PLAN_MOLLY'
+//		}
+//		else if (parsedDescription.matches(~/APPLE.*/)) {
+//			dto.payee = 'APPLE'
+//			dto.description = 'Cloud Storage'
+//			dto.category = 'CLOUD_STORAGE'
+//		}
+		else if (parsedDescription.startsWith('Apple')) {
 			dto.payee = 'APPLE'
 			dto.description = 'Cloud Storage'
 			dto.category = 'CLOUD_STORAGE'

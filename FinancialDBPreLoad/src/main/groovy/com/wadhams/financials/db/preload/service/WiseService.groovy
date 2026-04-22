@@ -3,7 +3,7 @@ package com.wadhams.financials.db.preload.service
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
+import com.wadhams.financials.db.preload.dto.DerivedValuesDTO
 import com.wadhams.financials.db.preload.dto.WiseDTO
 import com.wadhams.financials.db.preload.type.Status
 
@@ -31,6 +31,8 @@ class WiseService {
 		pw.print '<financials>'
 		
 		validDTOList.each {dto ->
+			DerivedValuesDTO derivedValuesDTO = buildDerivedValues(dto.targetName)
+			
 			pw.print '<data>'
 			
 			//transactionDate
@@ -41,12 +43,19 @@ class WiseService {
 			BigDecimal bd = new BigDecimal(dto.targetAmountAfterFees)
 			pw.print "<amt>$bd</amt>"
 
-			pw.print "<payee>N/A</payee>"
+			if (derivedValuesDTO.isValid()) {
+				pw.print "<payee>${derivedValuesDTO.payee}</payee>"
+				pw.print "<desc>${derivedValuesDTO.description}</desc>"
+				pw.print "<asset></asset>"
+				pw.print "<cat>${derivedValuesDTO.category}</cat>"
+			}
+			else {
+				pw.print "<payee>N/A</payee>"
+				pw.print "<desc>${dto.targetName}</desc>"
+				pw.print "<asset></asset><cat></cat>"
+			}
 			
-			//description
-			pw.print "<desc>${dto.targetName}</desc>"
-			
-			pw.print "<asset></asset><cat></cat><subcat></subcat><start></start><end></end><rg1></rg1><rg2></rg2><rg3></rg3></data>"
+			pw.print "<subcat></subcat><start></start><end></end><rg1></rg1><rg2></rg2><rg3></rg3></data>"
 		}
 		pw.println '</financials>'
 		pw.close()
@@ -90,5 +99,32 @@ class WiseService {
 			return wiseList[index]
 		}
 		return null
+	}
+	
+	DerivedValuesDTO buildDerivedValues(String targetName) {
+		DerivedValuesDTO dto = new DerivedValuesDTO()
+		
+		if (targetName == 'Coles Supermarkets') {
+			dto.payee = 'COLES'
+			dto.description = 'Groceries'
+			dto.category = 'FOOD'
+		}
+		else if (targetName == 'Woolworths Supermarkets') {
+			dto.payee = 'WOOLWORTHS'
+			dto.description = 'Groceries'
+			dto.category = 'FOOD'
+		}
+		else if (targetName.startsWith('Dan Murphy')) {
+			dto.payee = 'DAN MURPHYS'
+			dto.description = 'Beer &amp; Wine'
+			dto.category = 'ALCOHOL'
+		}
+		else if (targetName == 'BWS') {
+			dto.payee = 'BWS'
+			dto.description = 'Beer &amp; Wine'
+			dto.category = 'ALCOHOL'
+		}
+
+		return dto
 	}
 }
