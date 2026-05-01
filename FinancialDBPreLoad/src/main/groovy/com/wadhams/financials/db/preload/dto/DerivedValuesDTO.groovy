@@ -7,8 +7,4 @@ class DerivedValuesDTO {
 	String payee
 	String description
 	String category
-	
-	boolean isValid() {
-		return description != null
-	}
 }

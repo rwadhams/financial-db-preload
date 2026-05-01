@@ -23,7 +23,7 @@ class WiseCSVService {
 			//println line
 			def splitLine = line.split(",")
 			int cols = splitLine.size()
-			if (cols != 20) {
+			if (cols != 20 && cols != 21) {	//20 = without note, 21 = with note
 				println "Invalid line split. Col: $cols Line: $splitLine"
 			}
 			
@@ -55,7 +55,10 @@ class WiseCSVService {
 			dto.batch = splitLine[17]
 			dto.createdBy = splitLine[18]
 			dto.category = trimQuotes(splitLine[19])	//trimQuotes
-			
+			if (cols == 21) {
+				dto.note = trimQuotes(splitLine[20])	//trimQuotes
+			}
+
 			//Bypass business rules
 			if (dto.targetCurrency != 'AUD') {
 				dto.csvStatus = Status.Bypass

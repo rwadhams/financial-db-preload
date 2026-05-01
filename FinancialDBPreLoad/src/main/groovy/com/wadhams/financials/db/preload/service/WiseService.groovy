@@ -31,7 +31,7 @@ class WiseService {
 		pw.print '<financials>'
 		
 		validDTOList.each {dto ->
-			DerivedValuesDTO derivedValuesDTO = buildDerivedValues(dto.targetName)
+			DerivedValuesDTO derivedValuesDTO = buildDerivedValues(dto)
 			
 			pw.print '<data>'
 			
@@ -43,17 +43,10 @@ class WiseService {
 			BigDecimal bd = new BigDecimal(dto.targetAmountAfterFees)
 			pw.print "<amt>$bd</amt>"
 
-			if (derivedValuesDTO.isValid()) {
-				pw.print "<payee>${derivedValuesDTO.payee}</payee>"
-				pw.print "<desc>${derivedValuesDTO.description}</desc>"
-				pw.print "<asset></asset>"
-				pw.print "<cat>${derivedValuesDTO.category}</cat>"
-			}
-			else {
-				pw.print "<payee>N/A</payee>"
-				pw.print "<desc>${dto.targetName}</desc>"
-				pw.print "<asset></asset><cat></cat>"
-			}
+			pw.print "<payee>${derivedValuesDTO.payee}</payee>"
+			pw.print "<desc>${derivedValuesDTO.description}</desc>"
+			pw.print "<asset></asset>"
+			pw.print "<cat>${derivedValuesDTO.category}</cat>"
 			
 			pw.print "<subcat></subcat><start></start><end></end><rg1></rg1><rg2></rg2><rg3></rg3></data>"
 		}
@@ -101,28 +94,58 @@ class WiseService {
 		return null
 	}
 	
-	DerivedValuesDTO buildDerivedValues(String targetName) {
+	DerivedValuesDTO buildDerivedValues(WiseDTO wiseDTO) {
 		DerivedValuesDTO dto = new DerivedValuesDTO()
 		
-		if (targetName == 'Coles Supermarkets') {
+		String description = wiseDTO.targetName
+		if (wiseDTO.note) {
+			description = description + " - ${wiseDTO.note}"
+		}
+		
+		if (wiseDTO.targetName == 'Coles Supermarkets') {
 			dto.payee = 'COLES'
 			dto.description = 'Groceries'
 			dto.category = 'FOOD'
 		}
-		else if (targetName == 'Woolworths Supermarkets') {
+		else if (wiseDTO.targetName == 'Woolworths Supermarkets') {
 			dto.payee = 'WOOLWORTHS'
 			dto.description = 'Groceries'
 			dto.category = 'FOOD'
 		}
-		else if (targetName.startsWith('Dan Murphy')) {
+		else if (wiseDTO.targetName.startsWith('Dan Murphy')) {
 			dto.payee = 'DAN MURPHYS'
 			dto.description = 'Beer &amp; Wine'
 			dto.category = 'ALCOHOL'
 		}
-		else if (targetName == 'BWS') {
+		else if (wiseDTO.targetName.startsWith('BWS')) {
 			dto.payee = 'BWS'
 			dto.description = 'Beer &amp; Wine'
 			dto.category = 'ALCOHOL'
+		}
+		else if (wiseDTO.targetName == 'Chemist Warehouse') {
+			dto.payee = 'CHEMIST WAREHOUSE'
+			dto.description = 'Pills'
+			dto.category = 'PHARMACY'
+		}
+		else if (wiseDTO.targetName == 'Bunnings') {
+			dto.payee = 'BUNNINGS'
+			dto.description = ''
+			dto.category = ''
+		}
+		else if (wiseDTO.targetName.trim() == 'Kmart') {
+			dto.payee = 'KMART'
+			dto.description = ''
+			dto.category = ''
+		}
+		else if (wiseDTO.targetName == 'Supercheap Auto') {
+			dto.payee = 'SUPER CHEAP AUTO'
+			dto.description = ''
+			dto.category = ''
+		}
+		else {
+			dto.payee = 'N/A'
+			dto.description = description
+			dto.category = ''
 		}
 
 		return dto

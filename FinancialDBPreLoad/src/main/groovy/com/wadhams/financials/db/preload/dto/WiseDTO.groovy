@@ -29,7 +29,8 @@ class WiseDTO {
 	String batch
 	String createdBy
 	String category
-
+	String note
+	
 	//default constructor
 	def WiseDTO() {
 		
@@ -59,10 +60,11 @@ class WiseDTO {
 		this.batch = other.batch
 		this.createdBy = other.createdBy
 		this.category = other.category
+		this.note = other.note
 	}
 	
 	String displayValues() {
-		return "csvStatus: ${csvStatus.toString().padRight(6, ' ')} idPrefix: ${idPrefix.padRight(16, ' ')} status: ${status.padRight(9, ' ')} direction: ${direction.padRight(3, ' ')} Date: $created id: ${id} ($sourceCurrency->$targetCurrency) targetAmountAfterFees: ${targetAmountAfterFees} ($sourceName->$targetName) category: ${category}"
+		return "csvStatus: ${csvStatus.toString().padRight(6, ' ')} idPrefix: ${idPrefix.padRight(16, ' ')} status: ${status.padRight(9, ' ')} direction: ${direction.padRight(3, ' ')} Date: $created id: ${id} ($sourceCurrency->$targetCurrency) targetAmountAfterFees: ${targetAmountAfterFees} ($sourceName->$targetName) category: ${category} note: ${note}"
 	}
 
 }
